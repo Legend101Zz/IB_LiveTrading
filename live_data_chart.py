@@ -8,8 +8,11 @@ if __name__ == '__main__':
     ib = IB()
     ib.connect('127.0.0.1', 7497, clientId=1)
 
-    # request minute bars for a stock
-    stock = Stock('AAPL', 'SMART', 'USD')
+    # # request minute bars for a stock
+    # stock = Stock('AAPL', 'SMART', 'USD')
+
+    # request minute bars for forex
+    stock = Forex('EURUSD')
 
     bars = ib.reqHistoricalData(
         stock, endDateTime='', durationStr='3000 S',
@@ -19,7 +22,7 @@ if __name__ == '__main__':
     df = util.df(bars)
 
     # show the initial chart with the minute bars
-    chart = Chart(volume_enabled=False)
+    chart = Chart()
     chart.set(df)
     chart.show()
 
