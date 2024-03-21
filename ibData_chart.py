@@ -9,7 +9,7 @@ nest_asyncio.apply()
 
 def get_data(symbol, timeframe):
     ib = IB()
-    ib.connect('127.0.0.1', 7497, clientId=11)
+    ib.connect('127.0.0.1', 7497, clientId=1)
 
     contract = Stock(symbol, 'SMART', 'USD')
     bars = ib.reqHistoricalData(
@@ -46,14 +46,15 @@ class API:
     
 async def main():
     api = API()
-    chart = Chart(api=api, topbar=True, searchbox=True)
+    print('API',api)
+    chart = Chart()
     
     symbol = 'AAPL'
     timeframe = '15 mins'
     df = get_data(symbol, timeframe)
 
     chart.topbar.textbox('symbol', symbol)
-    chart.topbar.switcher('timeframe', api.on_timeframe, '15 mins', '1 hour', '1 day', default='15 mins')
+    # chart.topbar.switcher('timeframe', api.on_timeframe, '15 mins', '1 hour', '1 day', default='15 mins')
     
     chart.set(df)
 
