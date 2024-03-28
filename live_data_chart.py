@@ -12,11 +12,12 @@ if __name__ == '__main__':
     # stock = Stock('AAPL', 'SMART', 'USD')
 
     # request minute bars for forex
-    stock = Forex('EURUSD')
+    # stock = Forex('EURUSD')
+    stock= Crypto('BTC','PAXOS','USD')
 
     bars = ib.reqHistoricalData(
-        stock, endDateTime='', durationStr='3000 S',
-        barSizeSetting='1 min', whatToShow='MIDPOINT', useRTH=True)
+        stock, endDateTime='', durationStr='1 D',
+        barSizeSetting='5 mins', whatToShow='MIDPOINT', useRTH=True)
 
     # convert bars to a pandas dataframe
     df = util.df(bars)
@@ -38,6 +39,8 @@ if __name__ == '__main__':
                 if not last_price.empty:
                     print(last_price)
                     chart.update_from_tick(last_price.squeeze())
+
+
 
     ib.pendingTickersEvent += onPendingTicker
 

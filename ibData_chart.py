@@ -11,13 +11,16 @@ def get_data(symbol, timeframe):
     ib = IB()
     ib.connect('127.0.0.1', 7497, clientId=1)
 
-    contract = Stock(symbol, 'SMART', 'USD')
+    # contract = Stock(symbol, 'SMART', 'USD')
+
+    contract = Crypto(symbol,'PAXOS','USD')
+    
     bars = ib.reqHistoricalData(
             contract,
             endDateTime='',
             durationStr='90 D',
             barSizeSetting=timeframe,
-            whatToShow='TRADES',
+            whatToShow='AGGTRADES',
             useRTH=True,
             formatDate=1)
     ib.disconnect()
@@ -49,8 +52,8 @@ async def main():
     print('API',api)
     chart = Chart()
     
-    symbol = 'AAPL'
-    timeframe = '15 mins'
+    symbol = 'BTC'
+    timeframe = '1 secs'
     df = get_data(symbol, timeframe)
 
     chart.topbar.textbox('symbol', symbol)
@@ -63,3 +66,6 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
+
+
+

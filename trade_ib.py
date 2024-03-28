@@ -6,6 +6,7 @@ if __name__ == '__main__':
     ib = IB()
     ib.connect('127.0.0.1', 7497, clientId=13)
     contract = Forex('USDJPY')
+    
 
     bars = ib.reqHistoricalData(
             contract,
@@ -18,16 +19,17 @@ if __name__ == '__main__':
             
     df = util.df(bars)
 
-    chart = Chart()
-    chart.set(df)
-    chart.show()
+    # chart = Chart()
+    # chart.set(df)
+    # chart.show()
 
     def orderFilled(trade, fill):
         print("order has been filled")
         print(trade)
         print(fill)
         print(dir(fill))
-        chart.marker(text=f"order filled at {fill.execution.avgPrice}")
+        # chart.marker(text=f"order filled at {fill.execution.avgPrice}")
+        print(f"order filled at {fill.execution.avgPrice}")
 
     def onBarUpdate(bars, hasNewBar):
         last_bar = bars[-1]
@@ -41,19 +43,23 @@ if __name__ == '__main__':
             'volume': last_bar.volume
         })
 
-        chart.update(last_bar_series)
+        print(last_bar_series)
 
-        if len(bars) >= 3:
-            if bars[-1].close > bars[-1].open_ and \
-                bars[-2].close > bars[-2].open_ and \
-                bars[-3].close > bars[-3].open_:
+        # chart.update(last_bar_series)
+        order = MarketOrder('BUY', 1)
+        trade = ib.placeOrder(contract, order)
+        trade.fillEvent += orderFilled
+        # if len(bars) >= 3:
+        #     if bars[-1].close > bars[-1].open_ and \
+        #         bars[-2].close > bars[-2].open_ and \
+        #         bars[-3].close > bars[-3].open_:
                 
-                print("3 green bars, let's buy!")
+        #         print("3 green bars, let's buy!")
 
-                # buy 10 shares and call orderFilled() when it fills
-                order = MarketOrder('BUY', 1)
-                trade = ib.placeOrder(contract, order)
-                trade.fillEvent += orderFilled
+        #         # buy 10 shares and call orderFilled() when it fills
+        #         order = MarketOrder('BUY', 1)
+        #         trade = ib.placeOrder(contract, order)
+        #         trade.fillEvent += orderFilled
 
     bars = ib.reqRealTimeBars(contract, 5, 'MIDPOINT', False)
     bars.updateEvent += onBarUpdate
