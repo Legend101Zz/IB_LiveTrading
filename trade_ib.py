@@ -42,41 +42,47 @@ if __name__ == '__main__':
 
 
     def onBarUpdate(bars, hasNewBar):
+        global position
 
         df=pd.DataFrame(bars)[['date','open','high','low','close']]
         df['SMA'] = calculate_sma(df, sma_length)
         df.set_index('date',inplace=True)
         clear_output(wait=True)
         display(df)
-        # last_bar = bars[-1]
+        ma1 = df['SMA'][-2]  
+        ma2 = df['SMA'][-1]  
+        close = df['close'][-1]  
+        high = df['high'][-2]  
+        low = df['low'][-2] 
 
-        # last_bar_series = pd.Series({
-        #     'time': last_bar.time,
-        #     'open': last_bar.open_,
-        #     'high': last_bar.high,
-        #     'low': last_bar.low,
-        #     'close': last_bar.close,
-        #     'volume': last_bar.volume
-        # })
+        if ma2 > ma1 and not position:  
+            if close < ma2:
+                order = MarketOrder('BUY', 1)
+                trade = ib.placeOrder(contract, order)
+                position = 'long'
+                print("Buy order placed.")
 
-        # print(last_bar_series)
+        elif ma2 < ma1 and not position:  
+            if close > ma2:
+                order = MarketOrder('SELL', 1)
+                trade = ib.placeOrder(contract, order)
+                position = 'short'
+                print("Sell order placed.")
 
-        # chart.update(last_bar_series)
-        # order = MarketOrder('BUY', 1)
-        # trade = ib.placeOrder(contract, order)
-        # trade.fillEvent += orderFilled
-        # if len(bars) >= 3:
-        #     if bars[-1].close > bars[-1].open_ and \
-        #         bars[-2].close > bars[-2].open_ and \
-        #         bars[-3].close > bars[-3].open_:
-                
-        #         print("3 green bars, let's buy!")
+        elif position == 'long':  
+            if close > ma2 and close < low:
+                ib.placeOrder(contract, MarketOrder('SELL', 1))
+                position = ''
+                print("Take profit order placed for long position.")
 
-        #         # buy 10 shares and call orderFilled() when it fills
-        #         order = MarketOrder('BUY', 1)
-        #         trade = ib.placeOrder(contract, order)
-        #         trade.fillEvent += orderFilled
+        elif position == 'short': 
+            if close < ma2 and close > high:
+                ib.placeOrder(contract, MarketOrder('BUY', 1))
+                position = ''
+                print("Take profit order placed for short position.")
 
+
+    position = ''
     bars.updateEvent += onBarUpdate
 
     ib.run()
